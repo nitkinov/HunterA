@@ -1,0 +1,34 @@
+# Кэш Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Виртуальное окружение
+venv/
+.env
+
+# Конфигурационные файлы с чувствительными данными
+config.json
+*.key
+.encryption_key
+
+# Резервные копии
+backups/
+*.backup
+
+# Отчеты и временные файлы
+reports/*
+*.log
+*.tmp
+
+# Системные файлы
+.DS_Store
+Thumbs.db
+
+# Папка с кэшем HunterA (создается в домашней директории)
+~/.huntera/
+~/.huntera_cache/
+~/.huntera_history
