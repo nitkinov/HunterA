@@ -13,7 +13,6 @@ import sys
 import hashlib
 import base64
 import time
-import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -334,45 +333,46 @@ def maintenance(config: Dict):
         console.print("[6] Restore from Backup")
         console.print("[0] Back")
         choice = Prompt.ask("Select", choices=["0","1","2","3","4","5","6"])
-        if choice == "0": break
+        if choice == "0":
+            break
         elif choice == "1":
-    repo_url = "https://github.com/nitkinov/HunterA.git"
-    hunter_dir = os.path.expanduser("~/HunterA")
-    
-    # Check if git repository exists
-    if not os.path.exists(os.path.join(hunter_dir, ".git")):
-        console.print("[red]Not a git repository. Please clone from GitHub.[/red]")
-        console.print(f"[dim]Run: git clone {repo_url} ~/HunterA[/dim]")
-        return
-    
-    # Ensure origin points to the official repository
-    try:
-        current = subprocess.run(
-            ["git", "-C", hunter_dir, "remote", "get-url", "origin"],
-            capture_output=True, text=True
-        ).stdout.strip()
-        if current != repo_url:
-            console.print(f"[yellow]Remote origin changed from {current} to {repo_url}[/yellow]")
-            subprocess.run(["git", "-C", hunter_dir, "remote", "set-url", "origin", repo_url], check=True)
-    except subprocess.CalledProcessError:
-        # No origin found, add it
-        console.print("[yellow]No remote origin found, adding official repository.[/yellow]")
-        subprocess.run(["git", "-C", hunter_dir, "remote", "add", "origin", repo_url], check=True)
-    
-    console.print("[cyan]Fetching updates from GitHub...[/cyan]")
-    result = subprocess.run(
-        ["git", "-C", hunter_dir, "pull", "origin", "main"],
-        capture_output=True, text=True
-    )
-    if result.returncode == 0:
-        if "Already up to date." in result.stdout:
-            console.print("[green]Already up to date.[/green]")
-        else:
-            console.print("[green]HunterA updated successfully![/green]")
-            console.print(result.stdout.strip())
-            console.print("[yellow]Please restart HunterA to apply changes.[/yellow]")
-    else:
-        console.print(f"[red]Update failed: {result.stderr}[/red]")
+            repo_url = "https://github.com/nitkinov/HunterA.git"
+            hunter_dir = os.path.expanduser("~/HunterA")
+            
+            # Check if git repository exists
+            if not os.path.exists(os.path.join(hunter_dir, ".git")):
+                console.print("[red]Not a git repository. Please clone from GitHub.[/red]")
+                console.print(f"[dim]Run: git clone {repo_url} ~/HunterA[/dim]")
+                return
+            
+            # Ensure origin points to the official repository
+            try:
+                current = subprocess.run(
+                    ["git", "-C", hunter_dir, "remote", "get-url", "origin"],
+                    capture_output=True, text=True
+                ).stdout.strip()
+                if current != repo_url:
+                    console.print(f"[yellow]Remote origin changed from {current} to {repo_url}[/yellow]")
+                    subprocess.run(["git", "-C", hunter_dir, "remote", "set-url", "origin", repo_url], check=True)
+            except subprocess.CalledProcessError:
+                # No origin found, add it
+                console.print("[yellow]No remote origin found, adding official repository.[/yellow]")
+                subprocess.run(["git", "-C", hunter_dir, "remote", "add", "origin", repo_url], check=True)
+            
+            console.print("[cyan]Fetching updates from GitHub...[/cyan]")
+            result = subprocess.run(
+                ["git", "-C", hunter_dir, "pull", "origin", "main"],
+                capture_output=True, text=True
+            )
+            if result.returncode == 0:
+                if "Already up to date." in result.stdout:
+                    console.print("[green]Already up to date.[/green]")
+                else:
+                    console.print("[green]HunterA updated successfully![/green]")
+                    console.print(result.stdout.strip())
+                    console.print("[yellow]Please restart HunterA to apply changes.[/yellow]")
+            else:
+                console.print(f"[red]Update failed: {result.stderr}[/red]")
         elif choice == "2":
             deps = ["aiohttp", "python-nmap", "whois", "dnspython", "requests", "rich"]
             for dep in deps:
@@ -431,7 +431,7 @@ def profile_menu(config: Dict):
 def settings_menu():
     config = load_config()
     while True:
-        console.print(Panel("[bold red]SETTINGS (BLADE v4.0)[/bold red]", border_style="red", box=box.HEAVY))
+        console.print(Panel("[bold red]SETTINGS (BLADE v1.0)[/bold red]", border_style="red", box=box.HEAVY))
         console.print("[1] Network Settings")
         console.print("[2] API Keys (Encrypted)")
         console.print("[3] User-Agent Settings")
