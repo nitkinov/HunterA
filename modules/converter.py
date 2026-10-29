@@ -407,27 +407,27 @@ def display_detection_results(data: str, results: List[Tuple[str, float]]):
 # 7. MAIN MENU
 # ─────────────────────────────────────────────────────────────────
 def converter_menu():
-    console.print(Panel("[bold red]КОНВЕРТЕР ДАННЫХ (BLADE v1.0)[/bold red]",
+    console.print(Panel("[bold red]DATENKONVERTER (BLADE v1.0)[/bold red]",
                         border_style="red", box=box.HEAVY))
-    console.print("[dim]40+ форматов | Хеширование | Magic Mode | Pipes | JWT | Пакетный режим[/dim]")
+    console.print("[dim]Über 40 Formate | Hashing | Magic Mode | Pipelines | JWT | Stapelverarbeitung[/dim]")
 
     while True:
-        console.print("\n[bold]Выберите действие:[/bold]")
-        console.print("[1] Кодировать / Декодировать")
-        console.print("[2] Хешировать данные")
-        console.print("[3] Автоопределение (Magic Mode)")
-        console.print("[4] Разобрать JWT токен")
-        console.print("[5] Конвейер (Pipes) — несколько операций")
-        console.print("[0] Назад")
+        console.print("\n[bold]Aktion auswählen:[/bold]")
+        console.print("[1] Kodieren / Dekodieren")
+        console.print("[2] Daten hashen")
+        console.print("[3] Automatische Erkennung (Magic Mode)")
+        console.print("[4] JWT-Token analysieren")
+        console.print("[5] Pipeline — mehrere Operationen")
+        console.print("[0] Zurück")
 
-        choice = Prompt.ask("Ваш выбор", choices=["0","1","2","3","4","5"])
+        choice = Prompt.ask("Deine Auswahl", choices=["0","1","2","3","4","5"])
 
         if choice == "0":
             break
 
         elif choice == "1":
             # Encode/decode submenu
-            console.print("\n[bold]Выберите формат:[/bold]")
+            console.print("\n[bold]Format auswählen:[/bold]")
             console.print("[1] Base64      [2] Base64URL   [3] Base32    [4] Base16")
             console.print("[5] Base85      [6] Base45      [7] Base58    [8] Base91")
             console.print("[9] Hex         [10] Binary     [11] Octal    [12] URL")
@@ -435,8 +435,8 @@ def converter_menu():
             console.print("[17] Morse      [18] GZIP       [19] ZLIB     [20] XOR")
             console.print("[21] ASCII ↔ Text")
 
-            fmt = Prompt.ask("Номер формата", default="1")
-            text = Prompt.ask("Введите данные")
+            fmt = Prompt.ask("Formatnummer", default="1")
+            text = Prompt.ask("Daten eingeben")
 
             # Simple mapping
             encoders = {
@@ -465,16 +465,16 @@ def converter_menu():
 
             if fmt in encoders:
                 name, enc_fn, dec_fn = encoders[fmt]
-                direction = Prompt.ask("Направление", choices=["encode", "decode"], default="encode")
+                direction = Prompt.ask("Richtung", choices=["encode", "decode"], default="encode")
 
                 if fmt == "20":  # XOR special
-                    key_str = Prompt.ask("Ключ (число 0-255 или символ)", default="0")
+                    key_str = Prompt.ask("Schlüssel (Zahl von 0 bis 255 oder Zeichen)", default="0")
                     key = int(key_str) & 0xFF if key_str.isdigit() else ord(key_str[0])
                     if direction == "encode":
                         result = ''.join(chr(ord(c) ^ key) for c in text)
                     else:
                         result = text  # XOR is symmetric
-                    display_conversion_result(text, result, f"XOR с ключом {key} (0x{key:02x})")
+                    display_conversion_result(text, result, f"XOR mit Schlüssel {key} (0x{key:02x})")
                 elif direction == "encode":
                     result = enc_fn(text.encode())
                     display_conversion_result(text, result, f"{name} → Encode")
@@ -485,13 +485,13 @@ def converter_menu():
                     display_conversion_result(text, result, f"{name} → Decode")
 
             else:
-                console.print("[red]Неизвестный формат[/red]")
+                console.print("[red]Unbekanntes Format[/red]")
 
         elif choice == "2":
             # Hashing
-            text = Prompt.ask("Введите данные для хеширования")
-            console.print("Выберите алгоритмы (через запятую): md5,sha1,sha256,sha512,ntlm,all")
-            algo_str = Prompt.ask("Алгоритмы", default="sha256")
+            text = Prompt.ask("Zu hashende Daten eingeben")
+            console.print("Algorithmen auswählen (durch Komma getrennt): md5,sha1,sha256,sha512,ntlm,all")
+            algo_str = Prompt.ask("Algorithmen", default="sha256")
 
             if algo_str.lower() == "all":
                 algos = ['md5','sha1','sha224','sha256','sha384','sha512','sha3_256','sha3_512','blake2b','blake2s','ntlm']
@@ -506,14 +506,14 @@ def converter_menu():
 
         elif choice == "3":
             # Magic mode
-            text = Prompt.ask("Введите данные для анализа")
+            text = Prompt.ask("Zu analysierende Daten eingeben")
             results = detect_encoding(text)
             display_detection_results(text, results)
 
             if results and results[0][1] > 0.8:
-                if Confirm.ask("Попытаться автоматически декодировать?", default=True):
+                if Confirm.ask("Automatische Dekodierung versuchen?", default=True):
                     top_type = results[0][0]
-                    console.print(f"[cyan]Пробуем декодировать как {top_type}...[/cyan]")
+                    console.print(f"[cyan]Dekodierversuch als {top_type}...[/cyan]")
                     # Try to decode based on top match
                     decode_map = {
                         'Base64': lambda t: from_base64(t).decode('latin-1', errors='ignore'),
@@ -527,25 +527,25 @@ def converter_menu():
                             result = decode_map[top_type](text)
                             display_conversion_result(text, result, f"{top_type} → Auto-Decode")
                         except Exception as e:
-                            console.print(f"[red]Ошибка декодирования: {e}[/red]")
+                            console.print(f"[red]Dekodierungsfehler: {e}[/red]")
 
         elif choice == "4":
             # JWT decoder
-            token = Prompt.ask("Введите JWT токен")
+            token = Prompt.ask("JWT-Token eingeben")
             decoded = decode_jwt(token)
             display_jwt_details(token, decoded)
 
         elif choice == "5":
             # Pipes (chained operations)
-            console.print("[cyan]Конвейерная обработка данных[/cyan]")
-            console.print("Примеры операций: base64:decode, hex:encode, rot13:decode, xor:enc:42")
-            text = Prompt.ask("Введите данные")
-            ops_str = Prompt.ask("Операции через запятую (например, 'base64:decode,rot13:decode')")
+            console.print("[cyan]Datenverarbeitung mit Pipeline[/cyan]")
+            console.print("Beispiele: base64:decode, hex:encode, rot13:decode, xor:enc:42")
+            text = Prompt.ask("Daten eingeben")
+            ops_str = Prompt.ask("Operationen durch Komma getrennt (z. B. 'base64:decode,rot13:decode')")
             ops = [op.strip() for op in ops_str.split(',')]
             result = apply_pipeline(text, ops)
             display_conversion_result(text, result, " → ".join(ops))
 
-        console.input("\n[dim]Нажмите Enter для возврата...[/dim]")
+        console.input("\n[dim]Drücke Enter, um zurückzukehren...[/dim]")
 
 
 # Need zlib, gzip for compression

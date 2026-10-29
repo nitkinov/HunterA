@@ -1,9 +1,9 @@
 """
-HunterA - Модуль поиска и анализа уязвимостей (CVE) v1.0
+HunterA - Modul zur Suche und Analyse von Schwachstellen (CVE) v1.0
 ========================================================
-Многофакторный анализ: поиск по продукту/версии/баннеру/CPE,
-приоритизация по CVSS, EPSS и CISA KEV, интеграция с Nmap,
-автономная база данных SQLite и проверка эксплойтов в реальном времени.
+Mehrdimensionale Analyse: Suche nach Produkt, Version, Banner oder CPE,
+Priorisierung nach CVSS, EPSS und CISA KEV, Nmap-Integration,
+lokale SQLite-Datenbank und Echtzeitprüfung auf Exploits.
 """
 import asyncio
 import aiohttp
@@ -363,59 +363,59 @@ def parse_nmap_services(nmap_xml_path: str) -> List[Dict]:
     return []
 
 # ─────────────────────────────────────────────────────────────────
-# ГЛАВНОЕ МЕНЮ
+# HAUPTMENÜ
 # ─────────────────────────────────────────────────────────────────
 async def vuln_menu_async():
-    console.print(Panel("[bold red]ПОИСК И АНАЛИЗ УЯЗВИМОСТЕЙ (BLADE v1.0)[/bold red]", box=box.HEAVY, border_style="red"))
-    console.print("[dim]Многофакторный поиск CVE | CVSS + EPSS + KEV | Локальная БД[/dim]")
+    console.print(Panel("[bold red]SCHWACHSTELLENSUCHE UND -ANALYSE (BLADE v1.0)[/bold red]", box=box.HEAVY, border_style="red"))
+    console.print("[dim]CVE-Suche aus mehreren Quellen | CVSS + EPSS + KEV | Lokale Datenbank[/dim]")
 
     while True:
-        console.print("\n[bold]Выберите действие:[/bold]")
-        console.print("[1] Поиск по продукту/версии")
-        console.print("[2] Анализ баннера")
-        console.print("[3] Поиск по CPE")
-        console.print("[4] Пакетный режим (из Nmap)")
-        console.print("[0] Назад")
+        console.print("\n[bold]Aktion auswählen:[/bold]")
+        console.print("[1] Nach Produkt/Version suchen")
+        console.print("[2] Banner analysieren")
+        console.print("[3] Nach CPE suchen")
+        console.print("[4] Stapelverarbeitung (aus Nmap)")
+        console.print("[0] Zurück")
 
-        choice = Prompt.ask("Ваш выбор", choices=["0", "1", "2", "3", "4"])
+        choice = Prompt.ask("Deine Auswahl", choices=["0", "1", "2", "3", "4"])
 
         if choice == "0":
             break
 
         with Progress(SpinnerColumn(), TextColumn("[progress.description]{task.description}"), console=console) as progress:
             if choice == "1":
-                product = Prompt.ask("Введите продукт (например, 'apache')")
-                version = Prompt.ask("Версия (опционально)", default="")
+                product = Prompt.ask("Produkt eingeben (z. B. 'apache')")
+                version = Prompt.ask("Version (optional)", default="")
                 query = f"{product} {version}".strip()
-                progress.update(task, description="[cyan]Поиск CVE...")
+                progress.update(task, description="[cyan]CVE-Suche...")
                 cves = await search_cves(query)
-                display_cve_table(cves, f"Уязвимости для {query}")
+                display_cve_table(cves, f"Schwachstellen für {query}")
 
             elif choice == "2":
-                banner = Prompt.ask("Вставьте баннер сервиса")
+                banner = Prompt.ask("Dienst-Banner einfügen")
                 product, version = parse_banner_to_cpe(banner)
                 if product:
-                    console.print(f"[green]Распознано: {product} {version}[/green]")
+                    console.print(f"[green]Erkannt: {product} {version}[/green]")
                     query = f"{product} {version}".strip()
-                    progress.update(task, description="[cyan]Поиск CVE...")
+                    progress.update(task, description="[cyan]CVE-Suche...")
                     cves = await search_cves(query)
-                    display_cve_table(cves, f"Уязвимости для {product} {version}")
+                    display_cve_table(cves, f"Schwachstellen für {product} {version}")
                 else:
-                    console.print("[red]Не удалось распознать продукт и версию.[/red]")
+                    console.print("[red]Produkt und Version konnten nicht erkannt werden.[/red]")
 
             elif choice == "3":
-                cpe = Prompt.ask("Введите CPE (например, 'apache:http_server:2.4.41')")
-                progress.update(task, description="[cyan]Поиск по CPE...")
+                cpe = Prompt.ask("CPE eingeben (z. B. 'apache:http_server:2.4.41')")
+                progress.update(task, description="[cyan]CPE-Suche...")
                 cves = await search_cves(cpe)
-                display_cve_table(cves, f"Уязвимости для CPE {cpe}")
+                display_cve_table(cves, f"Schwachstellen für CPE {cpe}")
 
             elif choice == "4":
-                # Заглушка для пакетного режима
-                console.print("[yellow]Пакетный режим будет доступен после интеграции с Nmap.[/yellow]")
-                console.print("[dim]Пока можно вручную скопировать сервисы из вывода Nmap.[/dim]")
+                # Platzhalter für die Stapelverarbeitung
+                console.print("[yellow]Die Stapelverarbeitung ist nach der Nmap-Integration verfügbar.[/yellow]")
+                console.print("[dim]Bis dahin können Dienste manuell aus der Nmap-Ausgabe kopiert werden.[/dim]")
 
-        console.input("\n[dim]Нажмите Enter для возврата...[/dim]")
+        console.input("\n[dim]Drücke Enter, um zurückzukehren...[/dim]")
 
 def vuln_menu():
-    """Синхронная обёртка для вызова из главного меню."""
+    """Synchrone Wrapper-Funktion für den Aufruf aus dem Hauptmenü."""
     asyncio.run(vuln_menu_async())

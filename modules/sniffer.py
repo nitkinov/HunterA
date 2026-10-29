@@ -291,28 +291,28 @@ def export_packets(packets: List[Dict], format: str = "json", filename: str = No
 
 # ── Main Async Menu ────────────────────────────────────────
 async def sniffer_menu_async():
-    console.print(Panel("[bold red]СНИФФЕР (BLADE v1.0)[/bold red]", border_style="red", box=box.HEAVY))
+    console.print(Panel("[bold red]PAKET-SNIFFER (BLADE v1.0)[/bold red]", border_style="red", box=box.HEAVY))
     console.print("[dim]Python Async | tcpdump | PCAPdroid | tshark[/dim]")
 
     while True:
-        console.print("\n[bold]Выберите метод захвата:[/bold]")
-        console.print("[1] Python Async Sniffer (без root)")
-        console.print("[2] tcpdump (требуется root для wlan0)")
-        console.print("[3] PCAPdroid (без root, рекомендуется)")
-        console.print("[4] tshark (JSON парсинг)")
-        console.print("[5] Загрузить PCAP файл для анализа")
-        console.print("[0] Назад")
+        console.print("\n[bold]Aufnahmemethode auswählen:[/bold]")
+        console.print("[1] Asynchroner Python-Sniffer (ohne Root-Rechte)")
+        console.print("[2] tcpdump (Root-Rechte für wlan0 erforderlich)")
+        console.print("[3] PCAPdroid (ohne Root-Rechte, empfohlen)")
+        console.print("[4] tshark (JSON-Parsing)")
+        console.print("[5] PCAP-Datei zur Analyse laden")
+        console.print("[0] Zurück")
 
-        choice = Prompt.ask("Ваш выбор", choices=["0","1","2","3","4","5"])
+        choice = Prompt.ask("Deine Auswahl", choices=["0","1","2","3","4","5"])
 
         if choice == "0":
             break
 
         # Common parameters
-        packet_count = int(Prompt.ask("Количество пакетов", default=str(DEFAULT_PACKET_COUNT)))
-        filter_ip = Prompt.ask("Фильтр по IP (пусто - все)", default="")
-        filter_port = Prompt.ask("Фильтр по порту (пусто - все)", default="")
-        filter_proto = Prompt.ask("Фильтр по протоколу (tcp/udp/icmp)", default="")
+        packet_count = int(Prompt.ask("Anzahl der Pakete", default=str(DEFAULT_PACKET_COUNT)))
+        filter_ip = Prompt.ask("Nach IP filtern (leer = alle)", default="")
+        filter_port = Prompt.ask("Nach Port filtern (leer = alle)", default="")
+        filter_proto = Prompt.ask("Nach Protokoll filtern (tcp/udp/icmp)", default="")
 
         filter_ip = filter_ip if filter_ip else None
         filter_port = int(filter_port) if filter_port else None
@@ -322,7 +322,7 @@ async def sniffer_menu_async():
 
         with Progress(SpinnerColumn(), TextColumn("[progress.description]{task.description}"),
                       BarColumn(), TimeElapsedColumn(), console=console) as progress:
-            task = progress.add_task("[cyan]Захват пакетов...", total=packet_count)
+            task = progress.add_task("[cyan]Pakete werden aufgezeichnet...", total=packet_count)
 
             if choice == "1":
                 sniffer = AsyncSniffer(count=packet_count, filter_ip=filter_ip,
@@ -332,7 +332,7 @@ async def sniffer_menu_async():
                     console.print("[yellow]Python sniffer failed. Try PCAPdroid.[/yellow]")
 
             elif choice == "2":
-                iface = Prompt.ask("Интерфейс", default=DEFAULT_INTERFACE)
+                iface = Prompt.ask("Schnittstelle", default=DEFAULT_INTERFACE)
                 try:
                     cmd = ["tcpdump", "-i", iface, "-c", str(packet_count), "-l", "-n"]
                     if filter_port: cmd.extend(["port", str(filter_port)])
@@ -370,7 +370,7 @@ async def sniffer_menu_async():
                     console.print(f"[red]Error: {e}[/red]")
 
             elif choice == "3":
-                duration = int(Prompt.ask("Длительность захвата (сек)", default="30"))
+                duration = int(Prompt.ask("Aufnahmedauer (Sekunden)", default="30"))
                 pcap_file = await start_pcapdroid_capture(duration)
                 # In full version, parse PCAP here
                 console.print("[yellow]PCAPdroid capture completed. Use 'Load PCAP' option to analyze file.[/yellow]")
@@ -406,7 +406,7 @@ async def sniffer_menu_async():
                     console.print("[red]tshark error[/red]")
 
             elif choice == "5" and SCAPY_AVAILABLE:
-                pcap_path = Prompt.ask("Путь к PCAP файлу")
+                pcap_path = Prompt.ask("Pfad zur PCAP-Datei")
                 try:
                     scapy_pkts = scapy.rdpcap(pcap_path)
                     packets = []
@@ -431,13 +431,13 @@ async def sniffer_menu_async():
         if packets:
             display_packet_table(packets)
             display_statistics(packets)
-            if Confirm.ask("Экспортировать результаты?", default=False):
-                fmt = Prompt.ask("Формат", choices=["json","csv","pcap"], default="json")
+            if Confirm.ask("Ergebnisse exportieren?", default=False):
+                fmt = Prompt.ask("Format", choices=["json","csv","pcap"], default="json")
                 export_packets(packets, fmt)
         else:
-            console.print("[yellow]Нет пакетов для отображения.[/yellow]")
+            console.print("[yellow]Keine Pakete zum Anzeigen.[/yellow]")
 
-        console.input("\n[dim]Нажмите Enter для возврата...[/dim]")
+        console.input("\n[dim]Drücke Enter, um zurückzukehren...[/dim]")
 
 def sniffer_menu():
     asyncio.run(sniffer_menu_async())

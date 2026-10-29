@@ -613,7 +613,7 @@ async def check_security_headers(session, url: str) -> List[Dict]:
 def display_findings(all_findings: List[Dict], url: str):
     """Display all findings in a structured table."""
     if not all_findings:
-        console.print(Panel("[green]✓ Уязвимостей не обнаружено[/green]", border_style="green"))
+        console.print(Panel("[green]✓ Keine Schwachstellen gefunden[/green]", border_style="green"))
         return
 
     # Group by severity
@@ -652,23 +652,23 @@ def display_findings(all_findings: List[Dict], url: str):
 
 # ── Main Menu ─────────────────────────────────────────────────
 async def web_vuln_menu_async():
-    console.print(Panel("[bold red]СКАНЕР ВЕБ-УЯЗВИМОСТЕЙ (BLADE v1.0)[/bold red]",
+    console.print(Panel("[bold red]WEB-SCHWACHSTELLENSCANNER (BLADE v1.0)[/bold red]",
                         border_style="red", box=box.HEAVY))
     console.print("[dim]SQLi | XSS | LFI | SSTI | Open Redirect | CRLF | CMS | .git | Backup | Security Headers[/dim]")
 
-    url = Prompt.ask("Введите URL для сканирования")
+    url = Prompt.ask("Zu scannende URL eingeben")
     if not url.startswith(('http://', 'https://')):
         url = 'https://' + url
 
-    console.print("\n[bold]Выберите типы проверок:[/bold]")
-    console.print("[1] ВСЕ проверки (рекомендуется)")
-    console.print("[2] Только инъекции (SQLi, XSS, LFI, SSTI)")
-    console.print("[3] Только серверные (Open Redirect, CRLF, Headers)")
-    console.print("[4] Только разведка (CMS, .git, Backup)")
-    console.print("[5] Выбрать категории вручную")
-    console.print("[0] Назад")
+    console.print("\n[bold]Prüfungen auswählen:[/bold]")
+    console.print("[1] Alle Prüfungen (empfohlen)")
+    console.print("[2] Nur Injection-Tests (SQLi, XSS, LFI, SSTI)")
+    console.print("[3] Nur serverseitige Prüfungen (Open Redirect, CRLF, Header)")
+    console.print("[4] Nur Erkennung (CMS, .git, Backups)")
+    console.print("[5] Kategorien manuell auswählen")
+    console.print("[0] Zurück")
 
-    choice = Prompt.ask("Ваш выбор", choices=["0","1","2","3","4","5"])
+    choice = Prompt.ask("Deine Auswahl", choices=["0","1","2","3","4","5"])
 
     if choice == "0":
         return
@@ -685,7 +685,7 @@ async def web_vuln_menu_async():
     elif choice == "4":
         run_cms = run_git = run_backup = True
     elif choice == "5":
-        run_sqli = Confirm.ask("SQL-инъекции?", default=True)
+        run_sqli = Confirm.ask("SQL-Injection?", default=True)
         run_xss = Confirm.ask("XSS?", default=True)
         run_lfi = Confirm.ask("LFI / Path Traversal?", default=True)
         run_ssti = Confirm.ask("SSTI?", default=True)
@@ -708,7 +708,7 @@ async def web_vuln_menu_async():
         ) as progress:
             total_tasks = sum([run_sqli, run_xss, run_lfi, run_ssti, run_open_redirect,
                               run_crlf, run_cms, run_git, run_backup, run_headers])
-            task = progress.add_task("[cyan]Сканирование уязвимостей...", total=total_tasks)
+            task = progress.add_task("[cyan]Schwachstellen werden gesucht...", total=total_tasks)
 
             if run_sqli:
                 progress.update(task, description="[cyan]SQL Injection...")
@@ -772,8 +772,8 @@ async def web_vuln_menu_async():
                 progress.update(task, advance=1)
 
     display_findings(all_findings, url)
-    console.input("\n[dim]Нажмите Enter для возврата...[/dim]")
+    console.input("\n[dim]Drücke Enter, um zurückzukehren...[/dim]")
 
 def web_vuln_menu():
-    """Синхронная обёртка для вызова из главного меню."""
+    """Synchrone Wrapper-Funktion für den Aufruf aus dem Hauptmenü."""
     asyncio.run(web_vuln_menu_async())

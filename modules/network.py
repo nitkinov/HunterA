@@ -240,13 +240,13 @@ def display_results(results: Dict[str, List[Dict]], start: datetime):
 
 # ── Меню ───────────────────────────────────────────────
 def scanner_menu():
-    console.print(Panel("[bold red]ПОРТ-СКАНЕР (BLADE)[/]", border_style="red", box=box.HEAVY))
-    target = console.input("Цель ([cyan]IP, домен, CIDR[/]): ")
+    console.print(Panel("[bold red]PORTSCANNER (BLADE)[/]", border_style="red", box=box.HEAVY))
+    target = console.input("Ziel ([cyan]IP-Adresse, Domain, CIDR[/]): ")
 
-    # Выбор портов
-    console.print("\n[bold]Порты:[/]")
-    console.print("[1] 1-1000 [2] 1-5000 [3] 1-65535 [4] Топ-21 [5] Вручную")
-    choice = Prompt.ask("Выбор", choices=["1","2","3","4","5"], default="1")
+    # Ports auswählen
+    console.print("\n[bold]Ports:[/]")
+    console.print("[1] 1-1000 [2] 1-5000 [3] 1-65535 [4] Top 21 [5] Manuell")
+    choice = Prompt.ask("Auswahl", choices=["1","2","3","4","5"], default="1")
     if choice == "1":
         ports = list(range(1, 1001))
     elif choice == "2":
@@ -256,7 +256,7 @@ def scanner_menu():
     elif choice == "4":
         ports = TOP_PORTS
     else:
-        custom = Prompt.ask("Порты")
+        custom = Prompt.ask("Ports")
         ports = []
         for part in custom.split(","):
             if "-" in part:
@@ -265,16 +265,16 @@ def scanner_menu():
             else:
                 ports.append(int(part))
 
-    timeout = float(Prompt.ask("Таймаут", default=str(DEFAULT_TIMEOUT)))
-    workers = int(Prompt.ask("Потоков", default=str(DEFAULT_WORKERS)))
-    grab = Confirm.ask("Получать баннеры/сервисы?", default=True)
-    quiet = Confirm.ask("Тихий режим (только прогресс)?", default=True)
-    udp = Confirm.ask("Добавить UDP топ-100?", default=False)
+    timeout = float(Prompt.ask("Timeout", default=str(DEFAULT_TIMEOUT)))
+    workers = int(Prompt.ask("Anzahl der Threads", default=str(DEFAULT_WORKERS)))
+    grab = Confirm.ask("Banner und Dienste abrufen?", default=True)
+    quiet = Confirm.ask("Stiller Modus (nur Fortschritt anzeigen)?", default=True)
+    udp = Confirm.ask("Top 100 UDP-Ports hinzufügen?", default=False)
 
     start = datetime.now()
     results = asyncio.run(run_scan(target, ports, timeout, workers, grab, quiet))
     if udp:
-        console.print("\n[bold]UDP топ-100...[/]")
+        console.print("\n[bold]Top 100 UDP-Ports...[/]")
         udp_open = udp_scan(target, list(range(1, 101)), timeout)
         if udp_open:
             results.setdefault(target, []).extend(
@@ -282,4 +282,4 @@ def scanner_menu():
                 for p in udp_open)
     display_results(results, start)
 
-    console.input("[dim]Enter для возврата...[/]")
+    console.input("[dim]Drücke Enter, um zurückzukehren...[/]")

@@ -359,108 +359,108 @@ def display_hash_identification(hash_str: str, results: list):
 
 # ── Main Menu ───────────────────────────────────────────────
 def pass_hash_menu():
-    console.print(Panel("[bold red]ГЕНЕРАТОР ПАРОЛЕЙ / ХЕШИ (BLADE v1.0)[/bold red]",
+    console.print(Panel("[bold red]PASSWORT- UND HASH-GENERATOR (BLADE v1.0)[/bold red]",
                         border_style="red", box=box.HEAVY))
 
     while True:
-        console.print("\n[bold]Выберите действие:[/bold]")
-        console.print("[1] Сгенерировать пароль")
-        console.print("[2] Сгенерировать парольную фразу")
-        console.print("[3] Проверить стойкость пароля")
-        console.print("[4] Хешировать текст")
-        console.print("[5] Идентифицировать хеш")
-        console.print("[6] Сгенерировать словарь")
-        console.print("[7] Взломать хеш (словарная атака)")
-        console.print("[0] Назад")
+        console.print("\n[bold]Aktion auswählen:[/bold]")
+        console.print("[1] Passwort generieren")
+        console.print("[2] Passphrase generieren")
+        console.print("[3] Passwortstärke prüfen")
+        console.print("[4] Text hashen")
+        console.print("[5] Hash identifizieren")
+        console.print("[6] Wortliste generieren")
+        console.print("[7] Hash knacken (Wörterbuchangriff)")
+        console.print("[0] Zurück")
 
-        choice = Prompt.ask("Ваш выбор", choices=["0","1","2","3","4","5","6","7"])
+        choice = Prompt.ask("Deine Auswahl", choices=["0","1","2","3","4","5","6","7"])
 
         if choice == "0":
             break
 
         elif choice == "1":
-            length = int(Prompt.ask("Длина пароля", default="16"))
-            use_digits = Confirm.ask("Использовать цифры?", default=True)
-            use_symbols = Confirm.ask("Использовать символы?", default=True)
-            use_upper = Confirm.ask("Использовать заглавные?", default=True)
-            count = int(Prompt.ask("Количество паролей", default="3"))
+            length = int(Prompt.ask("Passwortlänge", default="16"))
+            use_digits = Confirm.ask("Ziffern verwenden?", default=True)
+            use_symbols = Confirm.ask("Sonderzeichen verwenden?", default=True)
+            use_upper = Confirm.ask("Großbuchstaben verwenden?", default=True)
+            count = int(Prompt.ask("Anzahl der Passwörter", default="3"))
 
-            console.print("\n[bold green]Сгенерированные пароли:[/bold green]")
+            console.print("\n[bold green]Generierte Passwörter:[/bold green]")
             for i in range(count):
                 pwd = generate_password(length, use_digits, use_symbols, use_upper)
                 console.print(f"  [{i+1}] [cyan]{pwd}[/cyan]")
 
         elif choice == "2":
-            word_count = int(Prompt.ask("Количество слов", default="4"))
-            separator = Prompt.ask("Разделитель", default="-")
-            capitalize = Confirm.ask("Заглавные буквы?", default=True)
-            count = int(Prompt.ask("Количество фраз", default="3"))
+            word_count = int(Prompt.ask("Anzahl der Wörter", default="4"))
+            separator = Prompt.ask("Trennzeichen", default="-")
+            capitalize = Confirm.ask("Anfangsbuchstaben großschreiben?", default=True)
+            count = int(Prompt.ask("Anzahl der Passphrasen", default="3"))
 
-            console.print("\n[bold green]Сгенерированные парольные фразы:[/bold green]")
+            console.print("\n[bold green]Generierte Passphrasen:[/bold green]")
             for i in range(count):
                 phrase = generate_passphrase(word_count, separator, capitalize)
                 console.print(f"  [{i+1}] [cyan]{phrase}[/cyan]")
 
         elif choice == "3":
-            password = Prompt.ask("Введите пароль для анализа")
+            password = Prompt.ask("Zu analysierendes Passwort eingeben")
             result = check_password_strength(password)
             display_strength(password, result)
 
         elif choice == "4":
-            text = Prompt.ask("Введите текст для хеширования")
-            console.print("\n[bold]Доступные алгоритмы:[/bold]")
+            text = Prompt.ask("Zu hashenden Text eingeben")
+            console.print("\n[bold]Verfügbare Algorithmen:[/bold]")
             console.print("md5, sha1, sha224, sha256, sha384, sha512, sha3_256, sha3_512, blake2b, blake2s")
-            algo = Prompt.ask("Алгоритм", default="sha256")
+            algo = Prompt.ask("Algorithmus", default="sha256")
             h = hash_text(text, algo)
             if h:
                 console.print(f"\n[bold green]{algo}:[/bold green] [cyan]{h}[/cyan]")
             else:
-                console.print("[red]Неизвестный алгоритм[/red]")
+                console.print("[red]Unbekannter Algorithmus[/red]")
 
         elif choice == "5":
-            hash_str = Prompt.ask("Введите хеш для идентификации")
+            hash_str = Prompt.ask("Zu identifizierenden Hash eingeben")
             results = identify_hash(hash_str)
             display_hash_identification(hash_str, results)
 
         elif choice == "6":
-            base_words_str = Prompt.ask("Ключевые слова через запятую (например, 'john,doe,1990,company')")
+            base_words_str = Prompt.ask("Schlüsselwörter durch Komma getrennt (z. B. 'john,doe,1990,company')")
             base_words = [w.strip() for w in base_words_str.split(",") if w.strip()]
             if not base_words:
-                console.print("[red]Не указаны ключевые слова[/red]")
+                console.print("[red]Keine Schlüsselwörter angegeben[/red]")
                 continue
 
-            min_len = int(Prompt.ask("Минимальная длина", default="6"))
-            max_len = int(Prompt.ask("Максимальная длина", default="16"))
-            use_leet = Confirm.ask("Использовать leet speak?", default=True)
-            add_nums = Confirm.ask("Добавлять числа?", default=True)
-            add_syms = Confirm.ask("Добавлять символы?", default=True)
+            min_len = int(Prompt.ask("Mindestlänge", default="6"))
+            max_len = int(Prompt.ask("Maximallänge", default="16"))
+            use_leet = Confirm.ask("Leetspeak verwenden?", default=True)
+            add_nums = Confirm.ask("Ziffern hinzufügen?", default=True)
+            add_syms = Confirm.ask("Sonderzeichen hinzufügen?", default=True)
 
             wordlist = generate_wordlist(base_words, min_len, max_len,
                                          use_leet, add_nums, add_syms)
-            console.print(f"\n[green]Сгенерировано слов: {len(wordlist)}[/green]")
+            console.print(f"\n[green]Generierte Wörter: {len(wordlist)}[/green]")
 
             if wordlist:
                 # Show preview
-                console.print("[dim]Первые 10 слов:[/dim]")
+                console.print("[dim]Die ersten 10 Wörter:[/dim]")
                 for w in wordlist[:10]:
                     console.print(f"  {w}")
 
-                if Confirm.ask("Сохранить в файл?", default=False):
-                    filepath = Prompt.ask("Путь к файлу", default="~/wordlist.txt")
+                if Confirm.ask("In Datei speichern?", default=False):
+                    filepath = Prompt.ask("Dateipfad", default="~/wordlist.txt")
                     filepath = os.path.expanduser(filepath)
                     with open(filepath, "w") as f:
                         f.write("\n".join(wordlist))
-                    console.print(f"[green]Сохранено: {filepath}[/green]")
+                    console.print(f"[green]Gespeichert: {filepath}[/green]")
 
         elif choice == "7":
-            target_hash = Prompt.ask("Введите хеш для взлома")
-            algo = Prompt.ask("Алгоритм (md5/sha1/sha256/sha512/ntlm)", default="md5")
+            target_hash = Prompt.ask("Zu knackenden Hash eingeben")
+            algo = Prompt.ask("Algorithmus (md5/sha1/sha256/sha512/ntlm)", default="md5")
 
-            console.print("\n[bold]Источник словаря:[/bold]")
-            console.print("[1] Встроенный (топ-1000 паролей)")
-            console.print("[2] Сгенерировать из ключевых слов")
-            console.print("[3] Загрузить из файла")
-            src = Prompt.ask("Выбор", choices=["1","2","3"], default="1")
+            console.print("\n[bold]Wortlistenquelle:[/bold]")
+            console.print("[1] Integrierte Liste (Top 1000 Passwörter)")
+            console.print("[2] Aus Schlüsselwörtern generieren")
+            console.print("[3] Aus Datei laden")
+            src = Prompt.ask("Auswahl", choices=["1","2","3"], default="1")
 
             if src == "1":
                 wordlist = [
@@ -470,30 +470,30 @@ def pass_hash_menu():
                     "princess", "login", "starwars", "shadow", "michael",
                 ]
             elif src == "2":
-                base = Prompt.ask("Ключевые слова через запятую")
+                base = Prompt.ask("Schlüsselwörter durch Komma getrennt")
                 base_words = [w.strip() for w in base.split(",") if w.strip()]
                 wordlist = generate_wordlist(base_words, max_combinations=5000)
             else:
-                filepath = Prompt.ask("Путь к файлу словаря")
+                filepath = Prompt.ask("Pfad zur Wortlistendatei")
                 try:
                     with open(os.path.expanduser(filepath)) as f:
                         wordlist = [l.strip() for l in f if l.strip()]
                 except FileNotFoundError:
-                    console.print("[red]Файл не найден[/red]")
+                    console.print("[red]Datei nicht gefunden[/red]")
                     continue
 
-            console.print(f"[cyan]Запуск атаки ({len(wordlist)} слов)...[/cyan]")
+            console.print(f"[cyan]Angriff wird gestartet ({len(wordlist)} Wörter)...[/cyan]")
             start_time = time.time()
             result = crack_hash(target_hash, algo, wordlist)
             elapsed = time.time() - start_time
 
             if result:
-                console.print(f"\n[green]ПАРОЛЬ НАЙДЕН: [bold]{result}[/bold][/green]")
+                console.print(f"\n[green]PASSWORT GEFUNDEN: [bold]{result}[/bold][/green]")
             else:
-                console.print(f"\n[yellow]Пароль не найден в словаре[/yellow]")
-            console.print(f"[dim]Время: {elapsed:.2f} сек, проверено слов: {len(wordlist)}[/dim]")
+                console.print(f"\n[yellow]Passwort nicht in der Wortliste gefunden[/yellow]")
+            console.print(f"[dim]Dauer: {elapsed:.2f} s, geprüfte Wörter: {len(wordlist)}[/dim]")
 
-        console.input("\n[dim]Нажмите Enter для возврата...[/dim]")
+        console.input("\n[dim]Drücke Enter, um zurückzukehren...[/dim]")
 
 
 # Need os for file operations

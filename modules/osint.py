@@ -398,20 +398,20 @@ def display_ip_intelligence(ip: str, data: Dict):
 # ─────────────────────────────────────────────────────────────────
 
 async def osint_menu_async():
-    console.print(Panel("[bold red]OSINT РАЗВЕДКА (BLADE v1.0)[/bold red]", border_style="red", box=box.HEAVY))
+    console.print(Panel("[bold red]OSINT-RECHERCHE (BLADE v1.0)[/bold red]", border_style="red", box=box.HEAVY))
     console.print("[dim]Email | Username | Phone | IP | Breach | Password | Quick Scan[/dim]")
 
     while True:
-        console.print("\n[bold]Выберите тип цели:[/bold]")
-        console.print("[1] Email (проверка утечек, соцсети, регистрации)")
-        console.print("[2] Username (поиск по 20+ платформам)")
-        console.print("[3] Phone (валидация, оператор, соцсети)")
-        console.print("[4] IP (геолокация, провайдер, репутация)")
-        console.print("[5] Breach (проверка пароля)")
-        console.print("[6] Quick Scan (все по email/username)")
-        console.print("[0] Назад")
+        console.print("\n[bold]Zieltyp auswählen:[/bold]")
+        console.print("[1] E-Mail (Datenlecks, soziale Netzwerke, Registrierungen)")
+        console.print("[2] Benutzername (Suche auf über 20 Plattformen)")
+        console.print("[3] Telefonnummer (Validierung, Anbieter, soziale Netzwerke)")
+        console.print("[4] IP-Adresse (Geolokalisierung, Anbieter, Reputation)")
+        console.print("[5] Datenleck (Passwortprüfung)")
+        console.print("[6] Schnellscan (E-Mail oder Benutzername)")
+        console.print("[0] Zurück")
 
-        choice = Prompt.ask("Ваш выбор", choices=["0","1","2","3","4","5","6"])
+        choice = Prompt.ask("Deine Auswahl", choices=["0","1","2","3","4","5","6"])
 
         if choice == "0":
             break
@@ -426,32 +426,32 @@ async def osint_menu_async():
             ) as progress:
 
                 if choice == "1":
-                    email = Prompt.ask("Введите email")
+                    email = Prompt.ask("E-Mail-Adresse eingeben")
                     if not validate_email_format(email):
-                        console.print("[red]Некорректный формат email[/red]")
+                        console.print("[red]Ungültiges E-Mail-Format[/red]")
                         continue
 
-                    task = progress.add_task("[cyan]Сбор данных...", total=100)
-                    progress.update(task, description="[cyan]Проверка HIBP...", completed=20)
+                    task = progress.add_task("[cyan]Daten werden gesammelt...", total=100)
+                    progress.update(task, description="[cyan]HIBP wird geprüft...", completed=20)
                     hibp_data = await check_hibp_breaches(session, email)
-                    progress.update(task, description="[cyan]Поиск соцсетей...", completed=50)
+                    progress.update(task, description="[cyan]Suche in sozialen Netzwerken...", completed=50)
                     social_data = await search_email_social(session, email)
-                    progress.update(task, description="[cyan]Проверка регистраций...", completed=80)
+                    progress.update(task, description="[cyan]Registrierungen werden geprüft...", completed=80)
                     reg_data = await check_email_registrations(session, email)
                     progress.update(task, completed=100)
 
                     display_email_results(email, hibp_data, social_data, reg_data)
 
                 elif choice == "2":
-                    username = Prompt.ask("Введите username")
-                    task = progress.add_task("[cyan]Поиск по платформам...", total=100)
+                    username = Prompt.ask("Benutzernamen eingeben")
+                    task = progress.add_task("[cyan]Suche auf Plattformen...", total=100)
                     platforms = await search_username_sherlock(session, username)
                     progress.update(task, completed=100)
                     display_username_results(username, platforms)
 
                 elif choice == "3":
-                    phone = Prompt.ask("Введите номер телефона (+79...)")
-                    task = progress.add_task("[cyan]Анализ номера...", total=100)
+                    phone = Prompt.ask("Telefonnummer eingeben (+49...)")
+                    task = progress.add_task("[cyan]Telefonnummer wird analysiert...", total=100)
                     parsed = parse_phone_number(phone)
                     progress.update(task, completed=50)
                     social = await search_phone_social(session, phone)
@@ -459,21 +459,21 @@ async def osint_menu_async():
                     display_phone_results(phone, parsed, social)
 
                 elif choice == "4":
-                    ip = Prompt.ask("Введите IP адрес")
-                    task = progress.add_task("[cyan]Сбор IP intelligence...", total=100)
+                    ip = Prompt.ask("IP-Adresse eingeben")
+                    task = progress.add_task("[cyan]IP-Informationen werden gesammelt...", total=100)
                     data = await ip_intelligence(session, ip)
                     progress.update(task, completed=100)
                     display_ip_intelligence(ip, data)
 
                 elif choice == "5":
-                    password = Prompt.ask("Введите пароль для проверки")
-                    task = progress.add_task("[cyan]Проверка пароля...", total=100)
+                    password = Prompt.ask("Zu prüfendes Passwort eingeben")
+                    task = progress.add_task("[cyan]Passwort wird geprüft...", total=100)
                     result = check_password_pwned(password)
                     progress.update(task, completed=100)
                     display_password_check(password, result)
 
                 elif choice == "6":
-                    target = Prompt.ask("Введите email или username")
+                    target = Prompt.ask("E-Mail-Adresse oder Benutzernamen eingeben")
                     if "@" in target:
                         email = target
                         task = progress.add_task("[cyan]Quick Scan (email)...", total=100)
@@ -489,8 +489,8 @@ async def osint_menu_async():
                         progress.update(task, completed=100)
                         display_username_results(username, platforms)
 
-        console.input("\n[dim]Нажмите Enter для возврата...[/dim]")
+        console.input("\n[dim]Drücke Enter, um zurückzukehren...[/dim]")
 
 def osint_menu():
-    """Синхронная обёртка для вызова из главного меню."""
+    """Synchrone Wrapper-Funktion für den Aufruf aus dem Hauptmenü."""
     asyncio.run(osint_menu_async())

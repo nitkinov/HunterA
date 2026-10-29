@@ -116,52 +116,52 @@ async def fuzz_directory(base_url, wordlist, threads=50, timeout=10, delay=0.1,
     return results
 
 def fuzzer_menu():
-    console.print(Panel("[bold red]ВЕБ-ФАЗЗЕР (BLADE v1.0)[/bold red]", border_style="red", box=box.HEAVY))
+    console.print(Panel("[bold red]WEB-FUZZER (BLADE v1.0)[/bold red]", border_style="red", box=box.HEAVY))
 
-    base_url = Prompt.ask("Введите URL (например, http://example.com)")
+    base_url = Prompt.ask("URL eingeben (z. B. http://example.com)")
     if not base_url.startswith(('http://', 'https://')):
         base_url = 'http://' + base_url
 
-    # Выбор словаря
-    console.print("\n[bold]Словарь:[/bold]")
-    console.print("[1] Встроенный")
-    console.print("[2] Загрузить из файла")
-    wl_choice = Prompt.ask("Выбор", choices=["1","2"], default="1")
+    # Wortliste auswählen
+    console.print("\n[bold]Wortliste:[/bold]")
+    console.print("[1] Integrierte Wortliste")
+    console.print("[2] Aus Datei laden")
+    wl_choice = Prompt.ask("Auswahl", choices=["1","2"], default="1")
     if wl_choice == "2":
-        path = Prompt.ask("Путь к файлу словаря")
+        path = Prompt.ask("Pfad zur Wortlistendatei")
         wordlist = load_wordlist(path)
     else:
         wordlist = DEFAULT_WORDLIST
 
-    # Расширения
+    # Dateierweiterungen
     exts = None
-    if Confirm.ask("Добавить расширения файлов?", default=False):
-        ext_str = Prompt.ask("Расширения через запятую", default="php,bak,old,txt,zip,sql")
+    if Confirm.ask("Dateierweiterungen hinzufügen?", default=False):
+        ext_str = Prompt.ask("Erweiterungen durch Komma getrennt", default="php,bak,old,txt,zip,sql")
         exts = [e.strip() for e in ext_str.split(',') if e.strip()]
 
-    # Фильтры
+    # Filter
     filter_codes = None
-    if Confirm.ask("Фильтровать по HTTP-статусам?", default=False):
-        codes = Prompt.ask("Исключаемые коды через запятую", default="404")
+    if Confirm.ask("Nach HTTP-Statuscodes filtern?", default=False):
+        codes = Prompt.ask("Auszuschließende Codes durch Komma getrennt", default="404")
         filter_codes = [int(c.strip()) for c in codes.split(',')]
 
     filter_size = None
-    if Confirm.ask("Фильтровать по размеру ответа?", default=False):
-        sizes = Prompt.ask("Исключаемые размеры через запятую", default="0")
+    if Confirm.ask("Nach Antwortgröße filtern?", default=False):
+        sizes = Prompt.ask("Auszuschließende Größen durch Komma getrennt", default="0")
         filter_size = [int(s.strip()) for s in sizes.split(',')]
 
     filter_regex = None
-    if Confirm.ask("Фильтровать по регулярному выражению?", default=False):
-        filter_regex = Prompt.ask("Regex (например, 'Not Found')")
+    if Confirm.ask("Nach regulärem Ausdruck filtern?", default=False):
+        filter_regex = Prompt.ask("Regulärer Ausdruck (z. B. 'Not Found')")
 
-    # Параметры сканирования
-    threads = int(Prompt.ask("Количество одновременных запросов", default="50"))
-    timeout = int(Prompt.ask("Таймаут запроса (сек)", default="10"))
-    delay = float(Prompt.ask("Задержка между запросами (0 - без задержки)", default="0.05"))
-    recursive = Confirm.ask("Рекурсивное сканирование?", default=False)
+    # Scanparameter
+    threads = int(Prompt.ask("Anzahl gleichzeitiger Anfragen", default="50"))
+    timeout = int(Prompt.ask("Anfrage-Timeout (Sekunden)", default="10"))
+    delay = float(Prompt.ask("Verzögerung zwischen Anfragen (0 = keine Verzögerung)", default="0.05"))
+    recursive = Confirm.ask("Rekursiv scannen?", default=False)
 
-    # Запуск
-    console.print(f"\n[bold]Начинаем фаззинг {base_url}...[/bold]")
+    # Start
+    console.print(f"\n[bold]Fuzzing von {base_url} wird gestartet...[/bold]")
     start_time = time.time()
     results = asyncio.run(fuzz_directory(
         base_url, wordlist, threads, timeout, delay,
@@ -170,18 +170,18 @@ def fuzzer_menu():
     ))
     elapsed = time.time() - start_time
 
-    # Вывод результатов
+    # Ergebnisse ausgeben
     if results:
-        # Убираем дубликаты для финальной таблицы
+        # Duplikate für die Abschlusstabelle entfernen
         unique = {r['url']: r for r in results}
-        table = Table(title=f"Результаты ({len(unique)} найдено за {elapsed:.1f}с)", box=box.ROUNDED)
+        table = Table(title=f"Ergebnisse ({len(unique)} gefunden in {elapsed:.1f} s)", box=box.ROUNDED)
         table.add_column("URL", style="cyan")
-        table.add_column("Статус", style="green", justify="center")
-        table.add_column("Размер", style="white")
+        table.add_column("Status", style="green", justify="center")
+        table.add_column("Größe", style="white")
         for r in unique.values():
             table.add_row(r['url'], str(r['status']), str(r['size']))
         console.print(table)
     else:
-        console.print("[yellow]Ничего не найдено.[/yellow]")
+        console.print("[yellow]Keine Ergebnisse gefunden.[/yellow]")
 
-    console.input("[dim]Нажмите Enter для возврата...[/dim]")
+    console.input("[dim]Drücke Enter, um zurückzukehren...[/dim]")

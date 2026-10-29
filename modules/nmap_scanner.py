@@ -203,38 +203,38 @@ def display_scan_results(nm, target, profile_name):
     console.print(f"\n[bold]Сканирование завершено. Хостов: {len(all_hosts)}[/bold]")
 
 def nmap_menu():
-    console.print(Panel("[bold red]NMAP СКАНЕР (BLADE v1.0)[/bold red]", border_style="red", box=box.HEAVY))
-    console.print("[dim]Работает без root: TCP Connect (-sT). Оптимизировано для Termux.[/dim]")
+    console.print(Panel("[bold red]NMAP-SCANNER (BLADE v1.0)[/bold red]", border_style="red", box=box.HEAVY))
+    console.print("[dim]Funktioniert ohne Root-Rechte: TCP Connect (-sT). Für Termux optimiert.[/dim]")
 
     while True:
-        console.print("\n[bold]Профили сканирования:[/bold]")
-        console.print("[1] Быстрое (топ-100 портов)")
-        console.print("[2] Полное (все порты, скрипты)")
-        console.print("[3] Уязвимости (NSE vuln)")
-        console.print("[4] Скрытое (обход IDS)")
-        console.print("[5] Сервисы (детект версий)")
-        console.print("[6] Кастомный Nmap")
-        console.print("[0] Назад")
+        console.print("\n[bold]Scanprofile:[/bold]")
+        console.print("[1] Schnellscan (Top 100 Ports)")
+        console.print("[2] Vollständiger Scan (alle Ports, Skripte)")
+        console.print("[3] Schwachstellen (NSE vuln)")
+        console.print("[4] Tarnmodus (IDS-Umgehung)")
+        console.print("[5] Dienste (Versionserkennung)")
+        console.print("[6] Benutzerdefinierter Nmap-Aufruf")
+        console.print("[0] Zurück")
 
-        choice = Prompt.ask("Ваш выбор", choices=["0","1","2","3","4","5","6"])
+        choice = Prompt.ask("Deine Auswahl", choices=["0","1","2","3","4","5","6"])
 
         if choice == "0":
             break
 
-        target = Prompt.ask("Цель (IP, домен, CIDR)")
+        target = Prompt.ask("Ziel (IP-Adresse, Domain, CIDR)")
 
         profile_map = {"1": "quick", "2": "full", "3": "vuln", "4": "stealth", "5": "service"}
         
         if choice in profile_map:
             nm = run_scan(target, PROFILES[profile_map[choice]], profile_map[choice])
         elif choice == "6":
-            custom_args = Prompt.ask("Аргументы Nmap (пример: -sT -p 80,443 -sV)")
-            # Принудительно добавляем --unprivileged в кастом, если его нет
+            custom_args = Prompt.ask("Nmap-Argumente (Beispiel: -sT -p 80,443 -sV)")
+            # --unprivileged bei benutzerdefinierten Argumenten erzwingen, falls nicht vorhanden
             if "--unprivileged" not in custom_args:
                 custom_args += " --unprivileged"
-            nm = run_scan(target, custom_args, "кастомный")
+            nm = run_scan(target, custom_args, "benutzerdefiniert")
 
         if nm:
-            display_scan_results(nm, target, "выбранный профиль" if choice != "6" else "кастомный")
+            display_scan_results(nm, target, "ausgewähltes Profil" if choice != "6" else "benutzerdefiniert")
 
-        console.input("\n[dim]Нажмите Enter для продолжения...[/dim]")
+        console.input("\n[dim]Drücke Enter, um fortzufahren...[/dim]")

@@ -329,21 +329,21 @@ def display_wifi(networks):
 
 # ── Меню ───────────────────────────────────────────────
 def arp_scan():
-    console.print(Panel("[bold red]ARP / WI-FI СКАНЕР (BLADE)[/bold red]", border_style="red", box=box.HEAVY))
+    console.print(Panel("[bold red]ARP-/WLAN-SCANNER (BLADE)[/bold red]", border_style="red", box=box.HEAVY))
 
     ip = get_local_ip()
     subnet = get_subnet_prefix(ip) if ip else None
 
-    console.print(f"\n[bold]Ваш IP:[/bold] {ip}")
+    console.print(f"\n[bold]Deine IP-Adresse:[/bold] {ip}")
     if subnet:
-        console.print(f"[bold]Подсеть:[/bold] {subnet}.0/24")
+        console.print(f"[bold]Subnetz:[/bold] {subnet}.0/24")
 
-    console.print("\n[bold]Выберите режим:[/bold]")
-    console.print("[1] Wi-Fi сети")
-    console.print("[2] Соседи (ARP + Ping)")
-    console.print("[3] Полное сканирование (Wi-Fi + Соседи)")
-    console.print("[0] Назад")
-    choice = Prompt.ask("Ваш выбор", choices=["0","1","2","3"])
+    console.print("\n[bold]Modus auswählen:[/bold]")
+    console.print("[1] WLAN-Netzwerke")
+    console.print("[2] Nachbargeräte (ARP + Ping)")
+    console.print("[3] Vollständiger Scan (WLAN + Nachbargeräte)")
+    console.print("[0] Zurück")
+    choice = Prompt.ask("Deine Auswahl", choices=["0","1","2","3"])
 
     if choice == "0":
         return
@@ -351,17 +351,17 @@ def arp_scan():
     with Progress(SpinnerColumn(), TextColumn("[progress.description]{task.description}"), console=console, transient=True) as progress:
         if choice in ("2", "3"):
             if not subnet:
-                console.print("[red]Не удалось определить подсеть.[/red]")
+                console.print("[red]Subnetz konnte nicht ermittelt werden.[/red]")
                 return
-            task = progress.add_task("[cyan]Сканирование соседей...", total=None)
+            task = progress.add_task("[cyan]Nachbargeräte werden gescannt...", total=None)
             entries, ping_hosts = scan_neighbors(subnet)
             progress.stop()
             display_neighbors(entries, ping_hosts)
 
         if choice in ("1", "3"):
-            task = progress.add_task("[cyan]Сканирование Wi-Fi...", total=None)
+            task = progress.add_task("[cyan]WLAN wird gescannt...", total=None)
             networks = scan_wifi()
             progress.stop()
             display_wifi(networks)
 
-    console.input("\n[dim]Нажмите Enter для возврата...[/dim]")
+    console.input("\n[dim]Drücke Enter, um zurückzukehren...[/dim]")
